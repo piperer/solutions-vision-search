@@ -223,7 +223,7 @@ def detect_labels(bucket_id, object_id):
         },
         'features': [{
             'type': 'LABEL_DETECTION',
-            'maxResults': 10,
+            'maxResults': 30,
         }]
     }]
 
