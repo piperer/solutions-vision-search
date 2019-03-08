@@ -198,12 +198,21 @@ def delete():
   """Deletes a document from the index."""
   try:
     response_dict = {}
-    doc_ids = request.args.get('id')
-    if doc_ids is 'all' or '*':
-      doc_ids = [document.doc_id for document in search.Index(name='imagesearch').get_range(ids_only=True)]
-    search.Index(name='imagesearch').delete([doc_ids])
-    response_dict['result'] = 'ok'
-
+    doc_id = request.args.get('id')
+    
+    if doc_id == 'all' or doc_id == '*':
+      while True:
+      # until no more documents, get a list of documents,
+      # constraining the returned objects to contain only the doc ids,
+      # extract the doc ids, and delete the docs.
+      document_ids = [document.doc_id for document in search.Index(name='imagesearch').get_range(ids_only=True)]
+      if not document_ids:
+        break
+      search.Index(name='imagesearch').delete(document_ids)
+      response_dict['result'] = 'ok all deleted'
+    else:  
+      search.Index(name='imagesearch').delete([doc_id])
+      response_dict['result'] = 'ok'
   except search.DeleteError:
     logging.exception('Something went wrong in delete()')
 
