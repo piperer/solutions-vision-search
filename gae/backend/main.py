@@ -207,6 +207,24 @@ def delete():
 
   return jsonify(response_dict)
 
+@app.route('/deleteAll', methods=['GET'])
+def deleteAllInIndex(cls):
+  """Delete all the docs in the given index."""
+  docindex = search.Index(name='imagesearch')
+
+  try:
+    while True:
+      # until no more documents, get a list of documents,
+      # constraining the returned objects to contain only the doc ids,
+      # extract the doc ids, and delete the docs.
+      document_ids = [document.doc_id for document in docindex.get_range(ids_only=True)]
+      if not document_ids:
+        break
+      docindex.delete(document_ids)
+  except search.DeleteError:
+    logging.exception("Error removing documents:")
+
+
 
 def detect_labels(bucket_id, object_id):
   """Detects labels from uploaded image."""
