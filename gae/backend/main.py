@@ -198,32 +198,16 @@ def delete():
   """Deletes a document from the index."""
   try:
     response_dict = {}
-    doc_id = request.args.get('id')
-    search.Index(name='imagesearch').delete([doc_id])
+    doc_ids = request.args.get('id')
+    if doc_ids is 'all' or '*':
+      doc_ids = [document.doc_id for document in search.Index(name='imagesearch').get_range(ids_only=True)]
+    search.Index(name='imagesearch').delete([doc_ids])
     response_dict['result'] = 'ok'
 
   except search.DeleteError:
     logging.exception('Something went wrong in delete()')
 
   return jsonify(response_dict)
-
-@app.route('/deleteAll', methods=['GET'])
-def deleteAllInIndex(cls):
-  """Delete all the docs in the given index."""
-  docindex = search.Index(name='imagesearch')
-
-  try:
-    while True:
-      # until no more documents, get a list of documents,
-      # constraining the returned objects to contain only the doc ids,
-      # extract the doc ids, and delete the docs.
-      document_ids = [document.doc_id for document in docindex.get_range(ids_only=True)]
-      if not document_ids:
-        break
-      docindex.delete(document_ids)
-  except search.DeleteError:
-    logging.exception("Error removing documents:")
-
 
 
 def detect_labels(bucket_id, object_id):
