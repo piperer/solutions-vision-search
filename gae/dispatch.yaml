@@ -19,5 +19,5 @@ dispatch:
     service: backend
   - url: "*/*"
     service: default
-  - url: "/deleteAll"
+  - url: "*/deleteAll"
     service: backend  
